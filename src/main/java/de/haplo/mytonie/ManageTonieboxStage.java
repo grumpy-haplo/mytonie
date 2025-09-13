@@ -112,17 +112,29 @@ public class ManageTonieboxStage extends MyStage {
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
+			} else if (ActionType.REMOVE.equals(action.getType())) {
+				try {
+					performRemoveAction(action);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
+
 		}
 	}
 
-	//TODO testen!
+	private void performRemoveAction(Action action) throws IOException {
+		File dataDir = new File(toniebox.getContentDirectory(), TonieUtil.directoryPart(action.getTonieId()));
+		
+		FileUtils.deleteDirectory(dataDir);
+	}
+
 	private void performAddAction(Action action) throws IOException {
 		File dataDir = new File(toniebox.getContentDirectory(), TonieUtil.directoryPart(action.getTonieId()));
 		File dstAudioFile = new File(dataDir, TonieUtil.filePart(action.getTonieId()));
 		File dstHashFile = new File(dataDir, TonieUtil.filePart(action.getTonieId()) + ".hash");
 		
-		dstAudioFile.mkdirs();
+		dataDir.mkdirs();
 		
 		Audiofile mAudiofile = getAudiofile(action.getAudioId());
 		File srcAudioFile = new File(model.getAudiofilesDirectory(), mAudiofile.getId());
@@ -178,7 +190,7 @@ public class ManageTonieboxStage extends MyStage {
 
         HBox row2 = new HBox(10);
         audiofileCombo = new ComboBox<>();
-        audiofileCombo.getItems().addAll(model.getAudiofiles().stream().map(a -> a.getName()+" ["+a.getId()+"]").toList());
+        audiofileCombo.getItems().addAll(model.getAudiofiles().stream().map(a -> a.getName()+" ["+a.getId()+"]").sorted().toList());
         row2.getChildren().addAll(new Label("Audio: "), audiofileCombo);
 
         Button addButton = new Button("Add");
